@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <stack>
 
 using namespace std;
 
@@ -18,6 +19,22 @@ int oprank(string op) {
     }
     return 0;
 }
+
+double Operasi(double a, double b, string op){
+    double total = 0;
+     if(op == "+"){
+         total = b + a;
+     }else if(op == "-"){
+         total = b - a;
+     }else if(op == "*"){
+         total = b * a;
+     }else if(op == "/"){
+         total = b / a;
+     }else if(op == "%"){
+         total = (int) b % (int) a;
+     }
+     return total;
+ }
 
 vector<string> strToInfix(string str) {
     vector<string> infix;
@@ -88,6 +105,31 @@ vector<string> infixToPostfix(vector<string>& infix) {
     return postfix;
 }
 
+ double evaluate(vector<string> postfix){
+     vector<string> op = {"+" , "-", "*", "/", "%"};
+     stack<double> total;
+
+     double a,b,c;
+     string temp;
+     for(auto itr = postfix.begin(); itr != postfix.end(); itr++){
+         string str = *itr;
+         if(isOperator(str[0]) && str.size() == 1){
+             a = total.top();
+             total.pop();
+             b = total.top();
+             total.pop();
+             temp = str;
+             c = Operasi(a, b, temp);
+             total.push(c);
+         }
+         else{
+             total.push(strtod((str).c_str(), NULL));
+         }
+     }
+     return total.top();
+ }
+
+
 
 void printfunc(const vector<string>& txt) {
     for (const auto& s : txt) {
@@ -103,6 +145,8 @@ int main() {
     vector<string> postfix = infixToPostfix(infix);
     printfunc(infix);
     printfunc(postfix);
+	cout << evaluate(postfix);
 
     return 0;
+
 }
