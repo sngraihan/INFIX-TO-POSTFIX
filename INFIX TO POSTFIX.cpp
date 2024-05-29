@@ -5,10 +5,19 @@
 
 using namespace std;
 
-bool isOperator(char ch){
-    vector<char> operators = {'+', '-', '/', '%'};
+bool isOperator(char ch) {
+    vector<char> operators = {'+', '-', '*', '/', '%'};
     return find(operators.begin(), operators.end(), ch) != operators.end();
+}
+
+int oprank(string op) {
+    if (op == "-" || op == "+") {
+        return 1;
+    } else if (op == "*" || op == "/" || op == "%") {
+        return 2;
     }
+    return 0;
+}
 
 vector<string> strToInfix(string str) {
     vector<string> infix;
@@ -47,23 +56,53 @@ vector<string> strToInfix(string str) {
     return infix;
 }
 
-void printfunc(vector<string> txt){
-    for(auto itr = txt.begin(); itr != txt.end(); itr++){
-        cout << *itr << " ";
+vector<string> infixToPostfix(vector<string>& infix) {
+    vector<string> postfix;
+    vector<string> op;
+    for (auto itr = infix.begin(); itr != infix.end(); itr++) {
+        string str = *itr;
+        if (isdigit(str[0]) || (str[0] == '-' && str.size() > 1 && isdigit(str[1]))) {
+            postfix.push_back(str);
+        } else if (str == "(") {
+            op.push_back(str); 
+        } else if (str == ")") {
+            while (!op.empty() && op.back() != "(") {
+                postfix.push_back(op.back());
+                op.pop_back();
+            }
+            if (!op.empty()) {
+                op.pop_back();
+            }
+        } else {
+            while (!op.empty() && op.back() != "(" && oprank(str) <= oprank(op.back())) {
+                postfix.push_back(op.back());
+                op.pop_back();
+            }
+            op.push_back(str);
+        }
+    }
+    while (!op.empty()) {
+        postfix.push_back(op.back());
+        op.pop_back();
+    }
+    return postfix;
+}
+
+
+void printfunc(const vector<string>& txt) {
+    for (const auto& s : txt) {
+        cout << s << " ";
     }
     cout << endl;
 }
 
-
-int main(){
+int main() {
     string input;
     getline(cin, input);
     vector<string> infix = strToInfix(input);
-	printfunc(infix);
-
+    vector<string> postfix = infixToPostfix(infix);
+    printfunc(infix);
+    printfunc(postfix);
 
     return 0;
-
-
-
 }
